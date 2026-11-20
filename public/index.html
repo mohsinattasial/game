@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minesweeper — Mohsin Atta</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,Arial,sans-serif}*{box-sizing:border-box}
+body{background:radial-gradient(circle at top,#19365e,#101826 65%);color:#ecf5ff;margin:0;min-height:100vh;display:grid;place-items:center;padding:20px}
+main{width:min(100%,570px)}h1{font-size:clamp(28px,5vw,42px);margin:0 0 8px}p{color:#acbed4;line-height:1.5}.panel{border:1px solid #33465e;border-radius:22px;background:#162438e9;padding:24px;box-shadow:0 20px 60px #0005}
+.top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.stats{display:flex;gap:10px;margin:14px 0}.stat{background:#22354d;border-radius:12px;padding:9px 13px;font-weight:700}button{cursor:pointer;color:inherit;font:inherit}
+#board{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;touch-action:manipulation}
+.cell{aspect-ratio:1;border:1px solid #486481;background:linear-gradient(135deg,#315a83,#244666);border-radius:7px;font-size:clamp(17px,4.5vw,27px);font-weight:800;transition:transform .1s}
+.cell:hover:not(:disabled){filter:brightness(1.2)}.cell:active{transform:scale(.93)}
+.cell.open{background:#dee8f1;border-color:#bfd0dd;color:#1c3447}.cell.mine{background:#c72d46;color:white}.cell.flag{background:#36527b}
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.action{border:1px solid #597b9c;background:#294866;border-radius:10px;padding:10px 14px}.action[aria-pressed=true]{border-color:#54dabb;background:#167b78}
+a{color:#76dfdc}.foot{font-size:13px;margin-top:20px}#status{min-height:28px;color:#65dfcc;font-weight:650}
+</style></head>
+<body><main class="panel">
+<div class="top"><div><h1>💣 Minesweeper</h1><p>Clear the field. Your first move is safe.</p></div><button id="restart" class="action">↻ New game</button></div>
+<div class="stats"><div class="stat">💣 <span id="mines">20</span> mines</div><div class="stat">🚩 <span id="flags">0</span> flags</div></div>
+<p id="status" role="status" aria-live="polite">Choose a tile to begin.</p>
+<div id="board" aria-label="8 by 8 minefield"></div>
+<div class="actions"><button class="action" id="flagMode" aria-pressed="false">🚩 Flag mode (touch)</button><a class="action" href="https://github.com/mohsinattasial/game">Source code</a></div>
+<p class="foot">Left click: reveal · Right click: flag · Mobile: toggle Flag mode. Browser adaptation of the original Python/Tkinter project.</p>
+</main>
+<script>
+const N=8,M=20;let cells,started,over,won,flags,flagMode=false;const board=document.getElementById('board');const status=document.getElementById('status');
+const near=(i)=>{let r=Math.floor(i/N),c=i%N,a=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){let y=r+dr,x=c+dc;if((dr||dc)&&x>=0&&x<N&&y>=0&&y<N)a.push(y*N+x)}return a};
+const count=(i)=>near(i).filter(j=>cells[j].mine).length;
+function reset(){cells=Array.from({length:N*N},()=>({mine:false,open:false,flag:false}));started=false;over=false;won=false;flags=0;status.textContent='Choose a tile to begin.';draw()}
+function place(first){const avail=Array.from({length:N*N},(_,i)=>i).filter(i=>i!==first);for(let i=avail.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[avail[i],avail[j]]=[avail[j],avail[i]]}avail.slice(0,M).forEach(i=>cells[i].mine=true);started=true}
+function toggle(i){if(over||cells[i].open)return;cells[i].flag=!cells[i].flag;flags+=cells[i].flag?1:-1;draw()}
+function reveal(i){if(over||cells[i].open||cells[i].flag)return;if(!started)place(i);let stack=[i];while(stack.length){let j=stack.pop(),c=cells[j];if(c.open||c.flag)continue;c.open=true;if(c.mine){over=true;status.textContent='Boom! Try another game.';break}if(!count(j))near(j).filter(k=>!cells[k].open&&!cells[k].flag).forEach(k=>stack.push(k))}
+if(!over&&cells.filter(c=>c.open&&!c.mine).length===N*N-M){over=true;won=true;status.textContent='You win! All safe tiles cleared. 🎉'}else if(!over)status.textContent='Keep going!';draw()}
+function draw(){board.innerHTML='';for(let i=0;i<N*N;i++){let c=cells[i],b=document.createElement('button');b.className='cell'+(c.open?' open':'')+(c.open&&c.mine?' mine':'')+(c.flag?' flag':'');b.setAttribute('aria-label', 'Row '+(Math.floor(i/N)+1)+', column '+(i%N+1)+(c.open?' revealed':' hidden'));const n=count(i);b.textContent=c.open?(c.mine?'💣':n||''):c.flag?'🚩':over&&c.mine?'💣':'';b.addEventListener('click',()=>flagMode?toggle(i):reveal(i));b.addEventListener('contextmenu',e=>{e.preventDefault();toggle(i)});board.append(b)}document.getElementById('flags').textContent=flags}
+document.getElementById('restart').addEventListener('click',reset);document.getElementById('flagMode').addEventListener('click',e=>{flagMode=!flagMode;e.currentTarget.setAttribute('aria-pressed',String(flagMode))});reset();
+</script></body></html>
