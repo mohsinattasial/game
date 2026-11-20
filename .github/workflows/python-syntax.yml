@@ -12,3 +12,5 @@ jobs:
           python-version: '3.11'
       - name: Compile Python sources without importing desktop or ML packages
         run: python -m compileall -q .
+      - name: Run Minesweeper game logic tests
+        run: python -m unittest -v test_minesweeper
