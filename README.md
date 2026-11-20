@@ -1,25 +1,24 @@
-# Minesweeper (Tkinter)
+# Minesweeper — Tkinter
 
-A desktop Minesweeper game written in Python using the standard-library Tkinter GUI.
+An 8×8 desktop Minesweeper game with 20 mines, a guaranteed safe first click, flood reveal of empty cells, right-click flags, win detection, and a New Game button.
 
 ## Run
-
-Requires Python 3 with Tkinter available (usually included on Windows and macOS).
+Requires Python 3.10+ with Tkinter installed (usually included on Windows).
 
 ```bash
 python main.py
 ```
 
-Click a cell to reveal it. A mine ends the round; a safe cell displays the number of adjacent mines. The board is 8×8 with 20 mines. The current implementation is a learning project and does not yet provide flags or automatic win detection.
+Left-click to reveal cells. Right-click to place or remove a flag. Use **New Game** to reset the board.
 
-## Project structure
+## Structure
+- `main.py`: Tkinter user interface
+- `minesweeper.py`: pure Python game rules (no GUI dependency)
+- `test_minesweeper.py`: unit tests
 
-- `main.py` — cells, mine placement, and Tkinter interface.
-
-## Possible improvements
-
-- Flag cells with right-click; prevent opening flagged cells.
-- Reveal neighboring empty cells automatically.
-- Add a restart button and a clear win condition.
+## Tests
+```bash
+python -m unittest -v test_minesweeper
+```
 
 Author: Mohsin Atta
