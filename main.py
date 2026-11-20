@@ -56,7 +56,7 @@ class MinesweeperApp:
                 elif self.board.over and cell.mine:
                     button.configure(text="💣", bg="#ffc6c6", state=tk.DISABLED)
                 else:
-                    button.configure(text="🚩" if cell.flagged else "", bg="SystemButtonFace",
+                    button.configure(text="🚩" if cell.flagged else "", bg="#f0f0f0",
                                      relief=tk.RAISED, state=tk.NORMAL)
         if self.board.over:
             self.status.set("YOU WIN!" if self.board.won else "Game over — try again")
